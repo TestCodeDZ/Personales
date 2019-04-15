@@ -355,7 +355,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jsp" alignment="0" pref="127" max="32767" attributes="0"/>
+              <Component id="jsp" alignment="0" pref="167" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -378,7 +378,7 @@
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JTable()"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="tbsaldos = new javax.swing.JTable(){&#xa;    public boolean isCellEditable(int rowIndex, int colIndex) {&#xa;        return false; //Disallow the editing of any cell&#xa;    }&#xa;};"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="tbsaldos = new javax.swing.JTable(){&#xa;    public boolean isCellEditable(int rowIndex, int colIndex) {&#xa;        return false; //Disallow the editing of any cell&#xa;    }&#xa;};&#xa;&#xa;tbsaldos.getTableHeader().setReorderingAllowed(false) ;&#xa;tbsaldos.setSelectionBackground(Color.GREEN);&#xa;tbsaldos.setSelectionForeground(Color.RED);&#xa;//rgb(44, 188, 164)"/>
               </AuxValues>
             </Component>
           </SubComponents>

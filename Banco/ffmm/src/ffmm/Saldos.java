@@ -5,17 +5,15 @@
  */
 package ffmm;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import Clases.Conecta;
+import static Clases.Conecta.conexion;
+import java.awt.Color;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -38,7 +36,7 @@ public class Saldos extends javax.swing.JInternalFrame {
         Cargartxtma();
         cbma.setVisible(false);
         calendar.getDateEditor().setEnabled(false);
-        
+        txtdiferencia.setText("0");
         /*DefaultTableModel tbsaldos = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int fila, int columna) {
@@ -67,13 +65,14 @@ public class Saldos extends javax.swing.JInternalFrame {
 
         String[] datos = new String[3];
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost/ffmm", "root", "");
-            Statement st = con.createStatement();
+            conexion = Conecta.getConexion();
+            Statement st = conexion.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
+                DecimalFormat formatea = new DecimalFormat("###,###.##");
                 datos[0] = rs.getString(1);
-                datos[1] = rs.getString(2);
-                datos[2] = rs.getString(3);
+                datos[1] = "$  "+(formatea.format(rs.getInt(2)));
+                datos[2] = "$  "+(formatea.format(rs.getInt(3)));
                 modelo.addRow(datos);
             }
             tbsaldos.setModel(modelo);
@@ -86,9 +85,9 @@ public class Saldos extends javax.swing.JInternalFrame {
     void anchocolumnas() {
         tbsaldos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 
-        tbsaldos.getColumnModel().getColumn(0).setWidth(100);
-        tbsaldos.getColumnModel().getColumn(0).setMaxWidth(100);
-        tbsaldos.getColumnModel().getColumn(0).setMinWidth(100);
+        tbsaldos.getColumnModel().getColumn(0).setWidth(75);
+        tbsaldos.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbsaldos.getColumnModel().getColumn(0).setMinWidth(75);
         
         tbsaldos.getColumnModel().getColumn(1).setWidth(200);
         tbsaldos.getColumnModel().getColumn(1).setMaxWidth(200);
@@ -100,52 +99,43 @@ public class Saldos extends javax.swing.JInternalFrame {
     }
     private void CargarCbma(){
         //Carga de Combo
-        try{
-            //Cargar Driver
-            Class.forName("com.mysql.jdbc.Driver");
-            //Crear Conexion
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost/ffmm","root","");
-            //Crear Consulta
-            Statement st = con.createStatement();
+        try {
+            conexion = Conecta.getConexion();
+            Statement st = conexion.createStatement();
             String sql = "SELECT max(ID) FROM saldos";
             //Ejecutar consulta
             ResultSet rs = st.executeQuery(sql);
             //Limpiamos el Combo
             cbma.setModel(new DefaultComboBoxModel());
-                      
             //Recorremos los registros traidos
-            while(rs.next()){
+            while (rs.next()) {
                 //Agregamos elemento al combo
                 cbma.addItem(rs.getObject(1));
             }
             //Cerramos conexión
-            con.close();
-        }catch(Exception e){
-             JOptionPane.showMessageDialog(null, "Error " + e.getMessage().toString());
+            conexion.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error " + e.getMessage().toString());
         }
     }
      private void Cargartxtma(){
         //Carga de Combo
-        try{
-            //Cargar Driver
-            Class.forName("com.mysql.jdbc.Driver");
-            //Crear Conexion
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost/ffmm","root","");
-            //Crear Consulta
-            Statement st1 = con.createStatement();  
-            String sql1 = "SELECT Monto FROM saldos WHERE ID='"+cbma.getSelectedItem()+"'";
-            //Ejecutar consulta
-            ResultSet rs1= st1.executeQuery(sql1);
-            //Recorremos los registros traidos
-            while(rs1.next()){
-                //Agregamos elemento al text
-                txtsa.setText(rs1.getObject("Monto").toString());
-            }
-            //Cerramos conexión
-            con.close();
-        }catch(Exception e){
+         try {
+             conexion = Conecta.getConexion();
+             Statement st1 = conexion.createStatement();
+             String sql1 = "SELECT Monto FROM saldos WHERE ID='" + cbma.getSelectedItem() + "'";
+             //Ejecutar consulta
+             ResultSet rs1 = st1.executeQuery(sql1);
+             //Recorremos los registros traidos
+             while (rs1.next()) {
+                 //Agregamos elemento al text
+                 txtsa.setText(rs1.getObject("Monto").toString());
+             }
+             //Cerramos conexión
+             conexion.close();
+         } catch (Exception e) {
              JOptionPane.showMessageDialog(null, "Error " + e.getMessage().toString());
-        }
+         }
     }
     void calculadiferencia(){
         String ma=txtsa.getText();
@@ -157,10 +147,8 @@ public class Saldos extends javax.swing.JInternalFrame {
     }
     
     private String validarVacios() {
-        
         String errores="";
-        
-        if(calendar.getDate()==null){
+        if(calendar.getDate() == null){
             errores+="Por favor ingrese la fecha \n";
         }
         if(txtmonto.getText().equals("")){
@@ -366,6 +354,11 @@ public class Saldos extends javax.swing.JInternalFrame {
                 return false; //Disallow the editing of any cell
             }
         };
+
+        tbsaldos.getTableHeader().setReorderingAllowed(false) ;
+        tbsaldos.setSelectionBackground(Color.GREEN);
+        tbsaldos.setSelectionForeground(Color.RED);
+        //rgb(44, 188, 164)
         tbsaldos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -387,7 +380,7 @@ public class Saldos extends javax.swing.JInternalFrame {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jsp, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+            .addComponent(jsp, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -423,42 +416,39 @@ public class Saldos extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btinsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btinsertarActionPerformed
-         String errores=validarVacios();
-        if(errores.equals("")){
-        try{
-            Date fc=calendar.getDate();
-            DateFormat fecha = new SimpleDateFormat("dd-MM-yyyy");
-            String convertido = fecha.format(fc);
-            //cargar driver de conexion mysql
-            Class.forName("com.mysql.jdbc.Driver");
-            //crear conexion
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost/ffmm","root","");
-            //crear la consulta
-            Statement st = con.createStatement();
-            //crear variable tipo string
-            String sql = "INSERT INTO saldos (Fecha,Monto,Diferencia) "
-                         + "VALUES('"+ convertido +"','"+ txtmonto.getText() +"','"+ txtdiferencia.getText() +"')";
-            //ejecutar consulta
-            st.executeUpdate(sql);
-            //cerrar conexion
-            con.close();
-            //Mostrar mensaje al usuario
-            JOptionPane.showMessageDialog(this,"Saldo Ingresado");
-            //limpiar los campos
+        String errores = validarVacios();
+        if (errores.equals("")) {
+            try {
+                Date fc = calendar.getDate();
+                DateFormat fecha = new SimpleDateFormat("dd-MM-yyyy");
+                String convertido = fecha.format(fc);
+                conexion = Conecta.getConexion();
+                //crear la consulta
+                Statement st = conexion.createStatement();
+                //crear variable tipo string
+                String sql = "INSERT INTO saldos (Fecha,Monto,Diferencia) "
+                        + "VALUES('" + convertido + "','" + txtmonto.getText() + "','" + txtdiferencia.getText() + "')";
+                //ejecutar consulta
+                st.executeUpdate(sql);
+                //cerrar conexion
+                conexion.close();
+                //Mostrar mensaje al usuario
+                JOptionPane.showMessageDialog(this, "Saldo Ingresado");
+                //limpiar los campos
                 //calendar.setText("");
                 txtmonto.setText("");
-                txtdiferencia.setText(""); 
+                txtdiferencia.setText("");
                 mostrardatos("");
                 anchocolumnas();
-            //dar foco a fecha
-            calendar.requestFocus();
-        }catch(Exception e){
-            //mensaje de error que declara la base de datos
-            JOptionPane.showMessageDialog(this,"ERROR" + e.getMessage().toString());
-        }
-        }else{
+                //dar foco a fecha
+                calendar.requestFocus();
+            } catch (Exception e) {
+                //mensaje de error que declara la base de datos
+                JOptionPane.showMessageDialog(this, "ERROR" + e.getMessage().toString());
+            }
+        } else {
             JOptionPane.showMessageDialog(null, errores);
-        } 
+        }
     }//GEN-LAST:event_btinsertarActionPerformed
 
     private void txtmontoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtmontoFocusLost

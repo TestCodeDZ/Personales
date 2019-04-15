@@ -16,6 +16,8 @@ public class Principal extends javax.swing.JFrame {
      */
     public Principal() {
         initComponents();
+        setResizable(false);
+        setLocationRelativeTo(null);
         
     }
 
@@ -41,16 +43,17 @@ public class Principal extends javax.swing.JFrame {
         mniinfsaldos = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(800, 750));
 
         javax.swing.GroupLayout jdpescritorioLayout = new javax.swing.GroupLayout(jdpescritorio);
         jdpescritorio.setLayout(jdpescritorioLayout);
         jdpescritorioLayout.setHorizontalGroup(
             jdpescritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 750, Short.MAX_VALUE)
         );
         jdpescritorioLayout.setVerticalGroup(
             jdpescritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGap(0, 455, Short.MAX_VALUE)
         );
 
         jMenu1.setText("File");

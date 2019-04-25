@@ -5,11 +5,10 @@
  */
 package Clases;
 
+import java.awt.Toolkit;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -29,7 +28,10 @@ public class Conecta {
             conexion = DriverManager.getConnection(servidorBD, usuarioDB, passwordDB);
             //System.out.println("Conectado a la BD");
         } catch (ClassNotFoundException | SQLException e) {
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(null, "Base de datos no disponible", "Error", JOptionPane.INFORMATION_MESSAGE);
+            //En caso de error si es que la base de datos no exista, o no esté xampp activado, simplemente cierra el sistema
+            System.exit(0);
         }
         return conexion;
     }
